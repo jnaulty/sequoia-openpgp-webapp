@@ -12,6 +12,7 @@ use yew::ContextProvider;
 mod components;
 
 use components::atoms::main_title::{Color, MainTitle};
+use components::atoms::key::Key;
 use components::molecules::custom_form::CustomForm;
 
 use crate::components::molecules::custom_form::Data;
@@ -31,6 +32,7 @@ fn generate(userid: String) -> openpgp::Result<openpgp::Cert> {
 pub struct User {
     pub userid: String,
     pub key: String,
+    pub key_submit: bool
 }
 
 #[styled_component(App)]
@@ -48,6 +50,7 @@ pub fn app() -> Html {
             let mut user = user_state.deref().clone();
             user.userid = format!("{} <{}>", data.username, data.email);
             user.key = key;
+            user.key_submit = true;
             user_state.set(user);
             //log!(key);
         })
@@ -76,10 +79,11 @@ pub fn app() -> Html {
                bg = "black",
                ft_color = "white",
            )} />
+        <MainTitle title="Sequoia OpenPGP Explorer" color={Color::Normal} on_load={&main_title_load}/> 
+        <MainTitle title="hello there, create a userid to generate some keys" color={Color::Ok} on_load={&main_title_load}/>
         <ContextProvider<User> context={user_state.deref().clone()}>
-            <MainTitle title="Sequoia OpenPGP Explorer" color={Color::Normal} on_load={&main_title_load}/> <MainTitle title="hello there, create a userid to generate some keys" color={Color::Ok} on_load={&main_title_load}/>
             <CustomForm onsubmit={custom_form_submit}/>
-
+            <Key/>           
         </ContextProvider<User>>
 
         </>

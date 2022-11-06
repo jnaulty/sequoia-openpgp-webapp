@@ -1,5 +1,3 @@
-use openpgp::cert::prelude::*;
-use sequoia_openpgp as openpgp;
 
 use crate::components::atoms::custom_button::CustomButton;
 use crate::components::atoms::text_input::TextInput;
@@ -56,9 +54,6 @@ pub fn custom_form(props: &Props) -> Html {
             <TextInput name="email" handle_onchange={email_changed} />
             <CustomButton label="Submit" />
             <p>{"userid:"}{user_context.clone().unwrap_or_default().userid}</p>
-            <p>{"Key:"}
-                <p><pre>{user_context.unwrap_or_default().key}</pre></p>
-            </p>
         </form>
 
     }

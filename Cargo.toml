@@ -7,11 +7,11 @@ edition = "2021"
 
 [dependencies]
 sequoia-openpgp = { version = "*", default-features = false, features = ["crypto-rust", "allow-experimental-crypto", "allow-variable-time-crypto"] }
-anyhow = { version = "*" }
 yew = "0.19"
 gloo = "0.8.0" 
 serde = "1.0.14"
 serde_json = "1.0.87"
 stylist = { version = "0.10.1", features = ["yew"] }
 wasm-bindgen = "0.2.83"
-web-sys = {versin = "", features = ["HtmlInputElement"]}
+web-sys = {versin = "*", features = ["HtmlInputElement"]}
+yew-router = "0.16.0"
