@@ -6,26 +6,25 @@ use std::ops::Deref;
 use yew::prelude::*;
 
 #[derive(Default, Clone)]
-pub struct Data {
+pub struct CustomData {
     pub username: String,
     pub email: String,
-    pub key: String,
 }
 
 #[derive(Properties, PartialEq)]
 pub struct Props {
-    pub onsubmit: Callback<Data>,
+    pub onsubmit: Callback<CustomData>,
 }
 
 #[function_component(CustomForm)]
 pub fn custom_form(props: &Props) -> Html {
-    let state = use_state(|| Data::default());
+    let state = use_state(|| CustomData::default());
     let cloned_state = state.clone();
 
     let user_context = use_context::<User>();
 
     let username_changed = Callback::from(move |username| {
-        cloned_state.set(Data {
+        cloned_state.set(CustomData {
             username,
             ..cloned_state.deref().clone()
         });
@@ -33,7 +32,7 @@ pub fn custom_form(props: &Props) -> Html {
 
     let cloned_state = state.clone();
     let email_changed = Callback::from(move |email| {
-        cloned_state.set(Data {
+        cloned_state.set(CustomData {
             email,
             ..cloned_state.deref().clone()
         });

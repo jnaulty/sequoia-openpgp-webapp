@@ -14,8 +14,10 @@ mod components;
 use components::atoms::main_title::{Color, MainTitle};
 use components::atoms::key::Key;
 use components::molecules::custom_form::CustomForm;
+use components::molecules::encrypt_form::EncryptForm;
 
-use crate::components::molecules::custom_form::Data;
+use crate::components::molecules::custom_form::CustomData;
+use crate::components::molecules::encrypt_form::EncryptData;
 
 fn generate(userid: String) -> openpgp::Result<openpgp::Cert> {
     let (cert, _revocation) = CertBuilder::new()
@@ -32,26 +34,48 @@ fn generate(userid: String) -> openpgp::Result<openpgp::Cert> {
 pub struct User {
     pub userid: String,
     pub key: String,
+    pub priv_key: String,
     pub key_submit: bool
+}
+
+#[derive(Debug, Clone, PartialEq, Default)]
+pub struct CipherText {
+    pub input: String,
+    pub encrypted_input: String,
 }
 
 #[styled_component(App)]
 pub fn app() -> Html {
     let user_state = use_state(User::default);
+    let ciphertext_state = use_state(CipherText::default);
     let main_title_load = Callback::from(|message: String| log!(message));
 
     let custom_form_submit = {
         let user_state = user_state.clone();
-        Callback::from(move |data: Data| {
+        Callback::from(move |data: CustomData| {
             let userid = format!("{} <{}>", data.username, data.email);
             let cert = generate(userid).unwrap();
             let key = String::from_utf8(cert.armored().to_vec().unwrap()).unwrap();
+            let priv_key = String::from_utf8(cert.as_tsk().armored().to_vec().unwrap()).unwrap();
 
             let mut user = user_state.deref().clone();
             user.userid = format!("{} <{}>", data.username, data.email);
             user.key = key;
+            user.priv_key = priv_key;
             user.key_submit = true;
             user_state.set(user);
+            //log!(key);
+        })
+    };
+
+    let encrypt_form_submit = {
+        let ciphertext_state = ciphertext_state.clone();
+        Callback::from(move |data: EncryptData| {
+            let input = data.input;
+            let mut ciphertext = ciphertext_state.deref().clone();
+            ciphertext.input = input;
+            ciphertext_state.set(ciphertext);
+            
             //log!(key);
         })
     };
@@ -84,6 +108,10 @@ pub fn app() -> Html {
         <ContextProvider<User> context={user_state.deref().clone()}>
             <CustomForm onsubmit={custom_form_submit}/>
             <Key/>           
+            <ContextProvider<CipherText> context={ciphertext_state.deref().clone()}>
+            <EncryptForm onsubmit={encrypt_form_submit}/>
+            // <DecryptForm/>
+            </ContextProvider<CipherText>>
         </ContextProvider<User>>
 
         </>
