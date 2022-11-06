@@ -630,8 +630,8 @@ function getImports() {
         const ret = wasm.memory;
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper1266 = function(arg0, arg1, arg2) {
-        const ret = makeClosure(arg0, arg1, 710, __wbg_adapter_26);
+    imports.wbg.__wbindgen_closure_wrapper1267 = function(arg0, arg1, arg2) {
+        const ret = makeClosure(arg0, arg1, 712, __wbg_adapter_26);
         return addHeapObject(ret);
     };
 
@@ -670,7 +670,7 @@ function initSync(module) {
 
 async function init(input) {
     if (typeof input === 'undefined') {
-        input = new URL('sequoia-pgp-guide-d41d3a091f21d42c_bg.wasm', import.meta.url);
+        input = new URL('sequoia-pgp-guide-24131d86098a7ad0_bg.wasm', import.meta.url);
     }
     const imports = getImports();
 
