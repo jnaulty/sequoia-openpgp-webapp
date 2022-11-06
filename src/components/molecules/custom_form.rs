@@ -1,30 +1,17 @@
-
-
-use sequoia_openpgp as openpgp;
-use openpgp::armor;
 use openpgp::cert::prelude::*;
-use openpgp::types::KeyFlags;
-use openpgp::serialize::Serialize;
+use sequoia_openpgp as openpgp;
 
-use std::ops::Deref;
-use gloo::console::log;
-use yew::prelude::*;
-use crate::User;
-use crate::components::atoms::text_input::TextInput;
 use crate::components::atoms::custom_button::CustomButton;
-
-
+use crate::components::atoms::text_input::TextInput;
+use crate::User;
+use std::ops::Deref;
+use yew::prelude::*;
 
 #[derive(Default, Clone)]
 pub struct Data {
     pub username: String,
     pub email: String,
     pub key: String,
-}
-
-#[derive(Clone)]
-pub struct CertData {
-    pub cert: Cert
 }
 
 #[derive(Properties, PartialEq)]
@@ -39,18 +26,17 @@ pub fn custom_form(props: &Props) -> Html {
 
     let user_context = use_context::<User>();
 
-
     let username_changed = Callback::from(move |username| {
         cloned_state.set(Data {
-            username, 
+            username,
             ..cloned_state.deref().clone()
         });
     });
 
     let cloned_state = state.clone();
-    let email_changed = Callback::from(move |email|  {
+    let email_changed = Callback::from(move |email| {
         cloned_state.set(Data {
-            email, 
+            email,
             ..cloned_state.deref().clone()
         });
     });

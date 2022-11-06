@@ -11,4 +11,3 @@ pub fn custom_button(props: &Props) -> Html {
         <button>{&props.label}</button>
     }
 }
-

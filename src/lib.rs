@@ -1,22 +1,20 @@
-
 use std::ops::Deref;
 
-use sequoia_openpgp as openpgp;
 use openpgp::cert::prelude::*;
 use openpgp::serialize::SerializeInto;
+use sequoia_openpgp as openpgp;
 
-use yew::prelude::*;
-use yew::ContextProvider;
 use gloo::console::log;
 use stylist::yew::{styled_component, Global};
+use yew::prelude::*;
+use yew::ContextProvider;
 
 mod components;
 
-use components::atoms::main_title::{MainTitle, Color};
+use components::atoms::main_title::{Color, MainTitle};
 use components::molecules::custom_form::CustomForm;
 
 use crate::components::molecules::custom_form::Data;
-
 
 fn generate(userid: String) -> openpgp::Result<openpgp::Cert> {
     let (cert, _revocation) = CertBuilder::new()
@@ -29,13 +27,11 @@ fn generate(userid: String) -> openpgp::Result<openpgp::Cert> {
     Ok(cert)
 }
 
-
 #[derive(Debug, Clone, PartialEq, Default)]
 pub struct User {
     pub userid: String,
     pub key: String,
 }
-
 
 #[styled_component(App)]
 pub fn app() -> Html {
@@ -56,7 +52,6 @@ pub fn app() -> Html {
             //log!(key);
         })
     };
-
 
     // start of html template
     html! {
@@ -90,4 +85,3 @@ pub fn app() -> Html {
         </>
     }
 }
-
