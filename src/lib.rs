@@ -239,12 +239,14 @@ pub fn app() -> Html {
             let key = user_cert_state.deref().clone().user_cert;
             let p = &P::new();
 
-            let ciphertext = ciphertext_state.deref().encrypted_input.as_bytes();
+
+            // there is a bug right now with encrypted_input_submitted not being parsed correctly into an OpenPGP message.
+            let ciphertext = data.input.as_bytes();
             let mut plaintext = Vec::new();
             decrypt(p, &mut plaintext, &ciphertext, &key).unwrap();
 
             let decrypted_output = str::from_utf8(&plaintext).unwrap();            
-            //log!(s);
+
             let mut ciphertext_struct = ciphertext_state.deref().clone();
             ciphertext_struct.decrypted_output = decrypted_output.to_string();
             ciphertext_struct.encrypted_input_submitted = data.input;

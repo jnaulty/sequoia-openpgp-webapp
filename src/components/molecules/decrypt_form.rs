@@ -1,6 +1,6 @@
 
 use crate::components::atoms::custom_button::CustomButton;
-use crate::components::atoms::text_input::TextInput;
+use crate::components::atoms::text_area_input::TextAreaInput;
 use crate::User;
 use crate::CipherText;
 use std::ops::Deref;
@@ -46,8 +46,11 @@ pub fn encrypt_form(props: &Props) -> Html {
     if ciphertext_context.clone().unwrap_or_default().encrypted_submit {
         html! {
             <form onsubmit={onsubmit}>
-                <TextInput name="ASCII-Armored PGP Message" handle_onchange={input_changed} />
+                <TextAreaInput name="-----BEGIN PGP MESSAGE-----" handle_onchange={input_changed} />
                 <CustomButton label="Submit" />
+                <p>{"ascii--armored input:"}
+                    <pre>{ciphertext_context.clone().unwrap_or_default().encrypted_input_submitted}</pre>
+                </p>
             </form>
 
         }
