@@ -1,5 +1,6 @@
 use std::ops::Deref;
-use std::io::{self, Write};
+use std::io::{self, Write, Read};
+use std::str;
 
 
 
@@ -25,11 +26,15 @@ mod components;
 use components::atoms::main_title::{Color, MainTitle};
 use components::atoms::key::Key;
 use components::atoms::encrypted_text::EncryptedText;
+use components::atoms::decrypted_text::DecryptedText;
+
 use components::molecules::custom_form::CustomForm;
 use components::molecules::encrypt_form::EncryptForm;
+use components::molecules::decrypt_form::DecryptForm;
 
 use crate::components::molecules::custom_form::CustomData;
 use crate::components::molecules::encrypt_form::EncryptData;
+use crate::components::molecules::decrypt_form::DecryptData;
 
 fn generate(userid: String) -> openpgp::Result<openpgp::Cert> {
     let (cert, _revocation) = CertBuilder::new()
@@ -72,6 +77,74 @@ fn encrypt(p: &dyn Policy, sink: &mut (dyn Write + Send + Sync),
 
     Ok(())
 }
+struct Helper<'a> {
+    secret: &'a openpgp::Cert,
+    policy: &'a dyn Policy,
+}
+
+
+impl<'a> DecryptionHelper for Helper<'a> {
+    fn decrypt<D>(&mut self,
+                  pkesks: &[openpgp::packet::PKESK],
+                  _skesks: &[openpgp::packet::SKESK],
+                  sym_algo: Option<SymmetricAlgorithm>,
+                  mut decrypt: D)
+                  -> openpgp::Result<Option<openpgp::Fingerprint>>
+        where D: FnMut(SymmetricAlgorithm, &SessionKey) -> bool
+    {
+        let key = self.secret.keys().unencrypted_secret()
+            .with_policy(self.policy, None)
+            .for_transport_encryption().next().unwrap().key().clone();
+
+        // The secret key is not encrypted.
+        let mut pair = key.into_keypair()?;
+
+        pkesks[0].decrypt(&mut pair, sym_algo)
+            .map(|(algo, session_key)| decrypt(algo, &session_key));
+
+        // XXX: In production code, return the Fingerprint of the
+        // recipient's Cert here
+        Ok(None)
+    }
+}
+impl<'a> VerificationHelper for Helper<'a> {
+    fn get_certs(&mut self, _ids: &[openpgp::KeyHandle])
+                       -> openpgp::Result<Vec<openpgp::Cert>> {
+        // Return public keys for signature verification here.
+        Ok(Vec::new())
+    }
+
+    fn check(&mut self, _structure: MessageStructure)
+             -> openpgp::Result<()> {
+        // Implement your signature verification policy here.
+        Ok(())
+    }
+}
+
+
+
+
+/// Decrypts the given message.
+fn decrypt(p: &dyn Policy,
+           sink: &mut dyn Write, ciphertext: &[u8], recipient: &openpgp::Cert)
+           -> openpgp::Result<()> {
+    // Make a helper that that feeds the recipient's secret key to the
+    // decryptor.
+    let helper = Helper {
+        secret: recipient,
+        policy: p,
+    };
+
+    // Now, create a decryptor with a helper using the given Certs.
+    let mut decryptor = DecryptorBuilder::from_bytes(ciphertext)?
+        .with_policy(p, None, helper)?;
+
+    // Decrypt the data.
+    io::copy(&mut decryptor, sink)?;
+
+    Ok(())
+}
+
 
 
 #[derive(Debug, Clone, PartialEq, Default)]
@@ -85,8 +158,10 @@ pub struct User {
 
 #[derive(Debug, Clone, PartialEq, Default)]
 pub struct CipherText {
-    pub input: String,
-    pub encrypted_input: String,
+    pub input: String, // string of what was inputted by user
+    pub encrypted_input: String, // string encrypted form input
+    pub encrypted_input_submitted: String, // string of what was inputted in form of encrypted ciphertext from user
+    pub decrypted_output: String, // decrypted output
     pub encrypted_submit: bool,
 }
 
@@ -155,6 +230,29 @@ pub fn app() -> Html {
         })
     };
 
+    let decrypt_form_submit = {
+        let ciphertext_state = ciphertext_state.clone();
+        let user_cert_state = user_cert_state.clone();
+        Callback::from(move |data: DecryptData| {
+            log!("in decrypt_from_submit callback");
+            // convert from ASCII-armor to vec
+            let key = user_cert_state.deref().clone().user_cert;
+            let p = &P::new();
+
+            let ciphertext = ciphertext_state.deref().encrypted_input.as_bytes();
+            let mut plaintext = Vec::new();
+            decrypt(p, &mut plaintext, &ciphertext, &key).unwrap();
+
+            let decrypted_output = str::from_utf8(&plaintext).unwrap();            
+            //log!(s);
+            let mut ciphertext_struct = ciphertext_state.deref().clone();
+            ciphertext_struct.decrypted_output = decrypted_output.to_string();
+            ciphertext_struct.encrypted_input_submitted = data.input;
+            ciphertext_state.set(ciphertext_struct);
+
+        })
+    };
+
     // start of html template
     html! {
         <>
@@ -186,7 +284,8 @@ pub fn app() -> Html {
             <ContextProvider<CipherText> context={ciphertext_state.deref().clone()}>
             <EncryptForm onsubmit={encrypt_form_submit}/>
             <EncryptedText/>
-            // <DecryptForm/>
+            <DecryptForm onsubmit={decrypt_form_submit}/>
+            <DecryptedText/>
             </ContextProvider<CipherText>>
         </ContextProvider<User>>
 
