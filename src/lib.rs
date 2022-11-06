@@ -163,6 +163,7 @@ pub struct CipherText {
     pub encrypted_input_submitted: String, // string of what was inputted in form of encrypted ciphertext from user
     pub decrypted_output: String, // decrypted output
     pub encrypted_submit: bool,
+    pub decrypted_submit: bool,
 }
 
 #[derive(Clone, PartialEq)]
@@ -250,6 +251,7 @@ pub fn app() -> Html {
             let mut ciphertext_struct = ciphertext_state.deref().clone();
             ciphertext_struct.decrypted_output = decrypted_output.to_string();
             ciphertext_struct.encrypted_input_submitted = data.input;
+            ciphertext_struct.decrypted_submit = true;
             ciphertext_state.set(ciphertext_struct);
 
         })
