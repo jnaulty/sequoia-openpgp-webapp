@@ -108,7 +108,6 @@ pub fn app() -> Html {
     let user_cert_state = use_state(|| {UserCert { user_cert: initial_cert}});
 
     let main_title_load = Callback::from(|message: String| log!(message));
-    let cert = generate(format!("hello")).unwrap();
 
     let custom_form_submit = {
         let user_state = user_state.clone();
@@ -117,8 +116,8 @@ pub fn app() -> Html {
         Callback::from(move |data: CustomData| {
             let userid = format!("{} <{}>", data.username, data.email);
             let user_cert = generate(userid).unwrap();
-            let key = String::from_utf8(cert.armored().to_vec().unwrap()).unwrap();
-            let priv_key = String::from_utf8(cert.as_tsk().armored().to_vec().unwrap()).unwrap();
+            let key = String::from_utf8(user_cert.armored().to_vec().unwrap()).unwrap();
+            let priv_key = String::from_utf8(user_cert.as_tsk().armored().to_vec().unwrap()).unwrap();
 
             let mut user = user_state.deref().clone();
             user.userid = format!("{} <{}>", data.username, data.email);
