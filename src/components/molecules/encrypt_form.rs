@@ -18,25 +18,25 @@ pub struct Props {
 #[function_component(EncryptForm)]
 pub fn encrypt_form(props: &Props) -> Html {
     let user_context: Option<User> = use_context::<User>();
-    let state = use_state(|| EncryptData::default());
-    let cloned_state = state.clone();
+    let _state = use_state(|| EncryptData::default());
+    let _cloned_state = _state.clone();
 
     let ciphertext_context = use_context::<CipherText>();
 
-    let cloned_state = state.clone();
+    let _cloned_state = _state.clone();
     let input_changed = Callback::from(move |input| {
-        cloned_state.set(EncryptData {
+        _cloned_state.set(EncryptData {
             input,
-            ..cloned_state.deref().clone()
+            .._cloned_state.deref().clone()
         });
     });
 
     let form_onsubmit = props.onsubmit.clone();
-    let cloned_state = state.clone();
+    let _cloned_state = _state.clone();
     let onsubmit = Callback::from(move |event: FocusEvent| {
         // do not submit form when submit is clicked
         event.prevent_default();
-        let data = cloned_state.deref().clone();
+        let data = _cloned_state.deref().clone();
         form_onsubmit.emit(data);
     });
 

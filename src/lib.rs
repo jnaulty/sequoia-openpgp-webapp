@@ -1,4 +1,4 @@
-use std::io::{self, Read, Write};
+use std::io::{self, Write};
 use std::ops::Deref;
 use std::str;
 
@@ -228,7 +228,7 @@ pub fn app() -> Html {
             let input = data.input;
             let key = user_cert_state.deref().clone().user_cert;
             let mut ciphertext = Vec::new();
-            let message = encrypt(p, &mut ciphertext, &input, &key).unwrap();
+            encrypt(p, &mut ciphertext, &input, &key).unwrap();
 
             let mut ciphertext_struct = ciphertext_state.deref().clone();
             ciphertext_struct.input = input;
