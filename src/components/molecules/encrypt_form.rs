@@ -1,8 +1,7 @@
-
 use crate::components::atoms::custom_button::CustomButton;
 use crate::components::atoms::text_input::TextInput;
-use crate::User;
 use crate::CipherText;
+use crate::User;
 use std::ops::Deref;
 use yew::prelude::*;
 
@@ -18,13 +17,11 @@ pub struct Props {
 
 #[function_component(EncryptForm)]
 pub fn encrypt_form(props: &Props) -> Html {
-
     let user_context: Option<User> = use_context::<User>();
     let state = use_state(|| EncryptData::default());
     let cloned_state = state.clone();
 
     let ciphertext_context = use_context::<CipherText>();
-
 
     let cloned_state = state.clone();
     let input_changed = Callback::from(move |input| {

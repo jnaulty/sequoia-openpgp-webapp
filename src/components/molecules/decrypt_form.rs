@@ -1,8 +1,7 @@
-
 use crate::components::atoms::custom_button::CustomButton;
 use crate::components::atoms::text_area_input::TextAreaInput;
-use crate::User;
 use crate::CipherText;
+use crate::User;
 use std::ops::Deref;
 use yew::prelude::*;
 
@@ -18,13 +17,11 @@ pub struct Props {
 
 #[function_component(DecryptForm)]
 pub fn encrypt_form(props: &Props) -> Html {
-
     let user_context: Option<User> = use_context::<User>();
     let state = use_state(|| DecryptData::default());
     let cloned_state = state.clone();
 
     let ciphertext_context = use_context::<CipherText>();
-
 
     let cloned_state = state.clone();
     let input_changed = Callback::from(move |input| {
@@ -43,7 +40,11 @@ pub fn encrypt_form(props: &Props) -> Html {
         form_onsubmit.emit(data);
     });
 
-    if ciphertext_context.clone().unwrap_or_default().encrypted_submit {
+    if ciphertext_context
+        .clone()
+        .unwrap_or_default()
+        .encrypted_submit
+    {
         html! {
             <form onsubmit={onsubmit}>
                 <TextAreaInput name="-----BEGIN PGP MESSAGE-----" handle_onchange={input_changed} />

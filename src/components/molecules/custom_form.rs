@@ -1,4 +1,3 @@
-
 use crate::components::atoms::custom_button::CustomButton;
 use crate::components::atoms::text_input::TextInput;
 use crate::User;

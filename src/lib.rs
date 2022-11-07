@@ -1,20 +1,17 @@
+use std::io::{self, Read, Write};
 use std::ops::Deref;
-use std::io::{self, Write, Read};
 use std::str;
 
-
-
-use openpgp::serialize::SerializeInto;
-use sequoia_openpgp as openpgp;
 use crate::openpgp::cert::prelude::*;
 use crate::openpgp::crypto::SessionKey;
-use crate::openpgp::types::SymmetricAlgorithm;
-use openpgp::types::DataFormat;
-use crate::openpgp::serialize::stream::*;
-use crate::openpgp::parse::{Parse, stream::*};
+use crate::openpgp::parse::{stream::*, Parse};
 use crate::openpgp::policy::Policy;
 use crate::openpgp::policy::StandardPolicy as P;
-
+use crate::openpgp::serialize::stream::*;
+use crate::openpgp::types::SymmetricAlgorithm;
+use openpgp::serialize::SerializeInto;
+use openpgp::types::DataFormat;
+use sequoia_openpgp as openpgp;
 
 use gloo::console::log;
 use stylist::yew::{styled_component, Global};
@@ -23,18 +20,18 @@ use yew::ContextProvider;
 
 mod components;
 
-use components::atoms::main_title::{Color, MainTitle};
-use components::atoms::key::Key;
-use components::atoms::encrypted_text::EncryptedText;
 use components::atoms::decrypted_text::DecryptedText;
+use components::atoms::encrypted_text::EncryptedText;
+use components::atoms::key::Key;
+use components::atoms::main_title::{Color, MainTitle};
 
 use components::molecules::custom_form::CustomForm;
-use components::molecules::encrypt_form::EncryptForm;
 use components::molecules::decrypt_form::DecryptForm;
+use components::molecules::encrypt_form::EncryptForm;
 
 use crate::components::molecules::custom_form::CustomData;
-use crate::components::molecules::encrypt_form::EncryptData;
 use crate::components::molecules::decrypt_form::DecryptData;
+use crate::components::molecules::encrypt_form::EncryptData;
 
 fn generate(userid: String) -> openpgp::Result<openpgp::Cert> {
     let (cert, _revocation) = CertBuilder::new()
@@ -48,12 +45,18 @@ fn generate(userid: String) -> openpgp::Result<openpgp::Cert> {
 }
 
 /// Encrypts the given message.
-fn encrypt(p: &dyn Policy, sink: &mut (dyn Write + Send + Sync),
-           plaintext: &str, recipient: &openpgp::Cert)
-    -> openpgp::Result<()>
-{
-    let recipients =
-        recipient.keys().with_policy(p, None).supported().alive().revoked(false)
+fn encrypt(
+    p: &dyn Policy,
+    sink: &mut (dyn Write + Send + Sync),
+    plaintext: &str,
+    recipient: &openpgp::Cert,
+) -> openpgp::Result<()> {
+    let recipients = recipient
+        .keys()
+        .with_policy(p, None)
+        .supported()
+        .alive()
+        .revoked(false)
         .for_transport_encryption();
 
     // Start streaming an OpenPGP message.
@@ -61,15 +64,15 @@ fn encrypt(p: &dyn Policy, sink: &mut (dyn Write + Send + Sync),
     let message = Armorer::new(message).build()?;
 
     // We want to encrypt a literal data packet.
-    let message = Encryptor::for_recipients(message, recipients)
-        .build()?;
+    let message = Encryptor::for_recipients(message, recipients).build()?;
 
     // Emit a literal data packet.
-    let mut message = LiteralWriter::new(message).format(DataFormat::Text).build()?;
+    let mut message = LiteralWriter::new(message)
+        .format(DataFormat::Text)
+        .build()?;
 
     // Encrypt the data.
     message.write_all(plaintext.as_bytes())?;
-
 
     // Finalize the OpenPGP message to make sure that all data is
     // written.
@@ -82,24 +85,33 @@ struct Helper<'a> {
     policy: &'a dyn Policy,
 }
 
-
 impl<'a> DecryptionHelper for Helper<'a> {
-    fn decrypt<D>(&mut self,
-                  pkesks: &[openpgp::packet::PKESK],
-                  _skesks: &[openpgp::packet::SKESK],
-                  sym_algo: Option<SymmetricAlgorithm>,
-                  mut decrypt: D)
-                  -> openpgp::Result<Option<openpgp::Fingerprint>>
-        where D: FnMut(SymmetricAlgorithm, &SessionKey) -> bool
+    fn decrypt<D>(
+        &mut self,
+        pkesks: &[openpgp::packet::PKESK],
+        _skesks: &[openpgp::packet::SKESK],
+        sym_algo: Option<SymmetricAlgorithm>,
+        mut decrypt: D,
+    ) -> openpgp::Result<Option<openpgp::Fingerprint>>
+    where
+        D: FnMut(SymmetricAlgorithm, &SessionKey) -> bool,
     {
-        let key = self.secret.keys().unencrypted_secret()
+        let key = self
+            .secret
+            .keys()
+            .unencrypted_secret()
             .with_policy(self.policy, None)
-            .for_transport_encryption().next().unwrap().key().clone();
+            .for_transport_encryption()
+            .next()
+            .unwrap()
+            .key()
+            .clone();
 
         // The secret key is not encrypted.
         let mut pair = key.into_keypair()?;
 
-        pkesks[0].decrypt(&mut pair, sym_algo)
+        pkesks[0]
+            .decrypt(&mut pair, sym_algo)
             .map(|(algo, session_key)| decrypt(algo, &session_key));
 
         // XXX: In production code, return the Fingerprint of the
@@ -108,26 +120,24 @@ impl<'a> DecryptionHelper for Helper<'a> {
     }
 }
 impl<'a> VerificationHelper for Helper<'a> {
-    fn get_certs(&mut self, _ids: &[openpgp::KeyHandle])
-                       -> openpgp::Result<Vec<openpgp::Cert>> {
+    fn get_certs(&mut self, _ids: &[openpgp::KeyHandle]) -> openpgp::Result<Vec<openpgp::Cert>> {
         // Return public keys for signature verification here.
         Ok(Vec::new())
     }
 
-    fn check(&mut self, _structure: MessageStructure)
-             -> openpgp::Result<()> {
+    fn check(&mut self, _structure: MessageStructure) -> openpgp::Result<()> {
         // Implement your signature verification policy here.
         Ok(())
     }
 }
 
-
-
-
 /// Decrypts the given message.
-fn decrypt(p: &dyn Policy,
-           sink: &mut dyn Write, ciphertext: &[u8], recipient: &openpgp::Cert)
-           -> openpgp::Result<()> {
+fn decrypt(
+    p: &dyn Policy,
+    sink: &mut dyn Write,
+    ciphertext: &[u8],
+    recipient: &openpgp::Cert,
+) -> openpgp::Result<()> {
     // Make a helper that that feeds the recipient's secret key to the
     // decryptor.
     let helper = Helper {
@@ -136,8 +146,7 @@ fn decrypt(p: &dyn Policy,
     };
 
     // Now, create a decryptor with a helper using the given Certs.
-    let mut decryptor = DecryptorBuilder::from_bytes(ciphertext)?
-        .with_policy(p, None, helper)?;
+    let mut decryptor = DecryptorBuilder::from_bytes(ciphertext)?.with_policy(p, None, helper)?;
 
     // Decrypt the data.
     io::copy(&mut decryptor, sink)?;
@@ -145,23 +154,20 @@ fn decrypt(p: &dyn Policy,
     Ok(())
 }
 
-
-
 #[derive(Debug, Clone, PartialEq, Default)]
 pub struct User {
     pub userid: String,
     pub key: String,
     pub priv_key: String,
-    pub key_submit: bool
+    pub key_submit: bool,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Default)]
 pub struct CipherText {
-    pub input: String, // string of what was inputted by user
-    pub encrypted_input: String, // string encrypted form input
+    pub input: String,                     // string of what was inputted by user
+    pub encrypted_input: String,           // string encrypted form input
     pub encrypted_input_submitted: String, // string of what was inputted in form of encrypted ciphertext from user
-    pub decrypted_output: String, // decrypted output
+    pub decrypted_output: String,          // decrypted output
     pub encrypted_submit: bool,
     pub decrypted_submit: bool,
 }
@@ -181,7 +187,9 @@ pub fn app() -> Html {
     // initialize cert (workaround for no Default implemented for Cert)
     let (initial_cert, _revocation_crt) = CertBuilder::new().generate().unwrap();
     // create user cert state context
-    let user_cert_state = use_state(|| {UserCert { user_cert: initial_cert}});
+    let user_cert_state = use_state(|| UserCert {
+        user_cert: initial_cert,
+    });
 
     let main_title_load = Callback::from(|message: String| log!(message));
 
@@ -193,7 +201,8 @@ pub fn app() -> Html {
             let userid = format!("{} <{}>", data.username, data.email);
             let user_cert = generate(userid).unwrap();
             let key = String::from_utf8(user_cert.armored().to_vec().unwrap()).unwrap();
-            let priv_key = String::from_utf8(user_cert.as_tsk().armored().to_vec().unwrap()).unwrap();
+            let priv_key =
+                String::from_utf8(user_cert.as_tsk().armored().to_vec().unwrap()).unwrap();
 
             let mut user = user_state.deref().clone();
             user.userid = format!("{} <{}>", data.username, data.email);
@@ -226,7 +235,7 @@ pub fn app() -> Html {
             ciphertext_struct.encrypted_input = String::from_utf8(ciphertext).unwrap();
             ciphertext_struct.encrypted_submit = true;
             ciphertext_state.set(ciphertext_struct);
-            
+
             //log!(key);
         })
     };
@@ -240,20 +249,18 @@ pub fn app() -> Html {
             let key = user_cert_state.deref().clone().user_cert;
             let p = &P::new();
 
-
             // there is a bug right now with encrypted_input_submitted not being parsed correctly into an OpenPGP message.
             let ciphertext = data.input.as_bytes();
             let mut plaintext = Vec::new();
             decrypt(p, &mut plaintext, &ciphertext, &key).unwrap();
 
-            let decrypted_output = str::from_utf8(&plaintext).unwrap();            
+            let decrypted_output = str::from_utf8(&plaintext).unwrap();
 
             let mut ciphertext_struct = ciphertext_state.deref().clone();
             ciphertext_struct.decrypted_output = decrypted_output.to_string();
             ciphertext_struct.encrypted_input_submitted = data.input;
             ciphertext_struct.decrypted_submit = true;
             ciphertext_state.set(ciphertext_struct);
-
         })
     };
 
@@ -280,11 +287,11 @@ pub fn app() -> Html {
                bg = "black",
                ft_color = "white",
            )} />
-        <MainTitle title="Sequoia OpenPGP Explorer" color={Color::Normal} on_load={&main_title_load}/> 
+        <MainTitle title="Sequoia OpenPGP Explorer" color={Color::Normal} on_load={&main_title_load}/>
         <MainTitle title="hello there, create a userid to generate some keys" color={Color::Ok} on_load={&main_title_load}/>
         <ContextProvider<User> context={user_state.deref().clone()}>
             <CustomForm onsubmit={custom_form_submit}/>
-            <Key/>           
+            <Key/>
             <ContextProvider<CipherText> context={ciphertext_state.deref().clone()}>
             <EncryptForm onsubmit={encrypt_form_submit}/>
             <EncryptedText/>
