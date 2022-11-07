@@ -31,19 +31,21 @@ For the former case, check out projects like yew.
 
 My pet peeve with web development is having to deal with javascript. I'm so happy to see frameworks like `Yew` developing in the rust ecosystem!
 
-### Sequoia-Openpgp
+### Why Sequoia-Openpgp?
 
 The Sequoia Project ([gitlab](https://gitlab.com/sequoia-pgp/sequoia)) is a 
 > cool new OpenPGP implementation.  It consists of several crates, providing both a low-level and a high-level API for dealing with OpenPGP data.
 
 Some cool features about this project is that it's a very complete implementation of OpenPGP standard in rust. This project is much more friendly for development than building something on top of the `gpg` ecosystem.
 
+The [RustCrypto Backend](https://gitlab.com/sequoia-pgp/sequoia/-/tree/main/openpgp#crypto-backends) also means this utility will be easier to port over into [xous-core](https://github.com/betrusted-io/xous-core) as an app. `xous-core` is the OS for a secure information/compute device called the Precursor.
+
 #### OpenPGP Web App Integration Features
 
 - [] Go through [Sequoia OpenPGP Examples](https://gitlab.com/sequoia-pgp/sequoia/-/tree/main/openpgp/examples)
     - [] [decrypt.rs](https://gitlab.com/sequoia-pgp/sequoia/-/blob/main/openpgp/examples/decrypt-with.rs)
     - [] [encrypt-for.rs](https://gitlab.com/sequoia-pgp/sequoia/-/blob/main/openpgp/examples/encrypt-for.rs)
-    - [] [generate-encrypt-decrypt.rs](https://gitlab.com/sequoia-pgp/sequoia/-/blob/main/openpgp/examples/generate-encrypt-decrypt.rs)
+    - [x] [generate-encrypt-decrypt.rs](https://gitlab.com/sequoia-pgp/sequoia/-/blob/main/openpgp/examples/generate-encrypt-decrypt.rs)
     - [] [generate-group-key.rs](https://gitlab.com/sequoia-pgp/sequoia/-/blob/main/openpgp/examples/generate-group-key.rs)
     - [] [generate-sign-verify.rs](https://gitlab.com/sequoia-pgp/sequoia/-/blob/main/openpgp/examples/generate-sign-verify.rs)
     - [] [notarize.rs](https://gitlab.com/sequoia-pgp/sequoia/-/blob/main/openpgp/examples/notarize.rs)
