@@ -42,21 +42,21 @@ The [RustCrypto Backend](https://gitlab.com/sequoia-pgp/sequoia/-/tree/main/open
 
 #### OpenPGP Web App Integration Features
 
-- [] Go through [Sequoia OpenPGP Examples](https://gitlab.com/sequoia-pgp/sequoia/-/tree/main/openpgp/examples)
-    - [] [decrypt.rs](https://gitlab.com/sequoia-pgp/sequoia/-/blob/main/openpgp/examples/decrypt-with.rs)
-    - [] [encrypt-for.rs](https://gitlab.com/sequoia-pgp/sequoia/-/blob/main/openpgp/examples/encrypt-for.rs)
+- [ ] Go through [Sequoia OpenPGP Examples](https://gitlab.com/sequoia-pgp/sequoia/-/tree/main/openpgp/examples)
+    - [ ] [decrypt.rs](https://gitlab.com/sequoia-pgp/sequoia/-/blob/main/openpgp/examples/decrypt-with.rs)
+    - [ ] [encrypt-for.rs](https://gitlab.com/sequoia-pgp/sequoia/-/blob/main/openpgp/examples/encrypt-for.rs)
     - [x] [generate-encrypt-decrypt.rs](https://gitlab.com/sequoia-pgp/sequoia/-/blob/main/openpgp/examples/generate-encrypt-decrypt.rs)
-    - [] [generate-group-key.rs](https://gitlab.com/sequoia-pgp/sequoia/-/blob/main/openpgp/examples/generate-group-key.rs)
-    - [] [generate-sign-verify.rs](https://gitlab.com/sequoia-pgp/sequoia/-/blob/main/openpgp/examples/generate-sign-verify.rs)
-    - [] [notarize.rs](https://gitlab.com/sequoia-pgp/sequoia/-/blob/main/openpgp/examples/notarize.rs)
-    - [] [pad.rs](https://gitlab.com/sequoia-pgp/sequoia/-/blob/main/openpgp/examples/pad.rs)
-    - [] [replly-encrypted.rs](https://gitlab.com/sequoia-pgp/sequoia/-/blob/main/openpgp/examples/reply-encrypted.rs)
-    - [] [sign-detached.rs](https://gitlab.com/sequoia-pgp/sequoia/-/blob/main/openpgp/examples/sign-detached.rs)
-    - [] [sign.rs](https://gitlab.com/sequoia-pgp/sequoia/-/blob/main/openpgp/examples/sign.rs)
-    - [] [statistics.rs](https://gitlab.com/sequoia-pgp/sequoia/-/blob/main/openpgp/examples/statistics.rs)
-    - [] [supported-algorithms.rs](https://gitlab.com/sequoia-pgp/sequoia/-/blob/main/openpgp/examples/supported-algorithms.rs)
-    - [] [web-of-trust.rs](https://gitlab.com/sequoia-pgp/sequoia/-/blob/main/openpgp/examples/web-of-trust.rs)
-    - [] [wrap-literal.rs](https://gitlab.com/sequoia-pgp/sequoia/-/blob/main/openpgp/examples/wrap-literal.rs)
+    - [ ] [generate-group-key.rs](https://gitlab.com/sequoia-pgp/sequoia/-/blob/main/openpgp/examples/generate-group-key.rs)
+    - [ ] [generate-sign-verify.rs](https://gitlab.com/sequoia-pgp/sequoia/-/blob/main/openpgp/examples/generate-sign-verify.rs)
+    - [ ] [notarize.rs](https://gitlab.com/sequoia-pgp/sequoia/-/blob/main/openpgp/examples/notarize.rs)
+    - [ ] [pad.rs](https://gitlab.com/sequoia-pgp/sequoia/-/blob/main/openpgp/examples/pad.rs)
+    - [ ] [replly-encrypted.rs](https://gitlab.com/sequoia-pgp/sequoia/-/blob/main/openpgp/examples/reply-encrypted.rs)
+    - [ ] [sign-detached.rs](https://gitlab.com/sequoia-pgp/sequoia/-/blob/main/openpgp/examples/sign-detached.rs)
+    - [ ] [sign.rs](https://gitlab.com/sequoia-pgp/sequoia/-/blob/main/openpgp/examples/sign.rs)
+    - [ ] [statistics.rs](https://gitlab.com/sequoia-pgp/sequoia/-/blob/main/openpgp/examples/statistics.rs)
+    - [ ] [supported-algorithms.rs](https://gitlab.com/sequoia-pgp/sequoia/-/blob/main/openpgp/examples/supported-algorithms.rs)
+    - [ ] [web-of-trust.rs](https://gitlab.com/sequoia-pgp/sequoia/-/blob/main/openpgp/examples/web-of-trust.rs)
+    - [ ] [wrap-literal.rs](https://gitlab.com/sequoia-pgp/sequoia/-/blob/main/openpgp/examples/wrap-literal.rs)
 
 
 ## Miscellaneous
