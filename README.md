@@ -1,4 +1,4 @@
-# Sequoia OpenPGP Demo on WASM using Yew
+# Sequoia OpenPGP WebApp Demo
 
 `sequoia-openpgp-webapp` is a playground project I created to explore pgp on the web, in rust.
 
@@ -6,7 +6,7 @@ My objective was to create a web app written completely in rust that could show 
 I've had exposure to Javascript web frameworks like Angular, React, and Vue, but wanted to stay completely within the rust ecosystem.
 I'd like to get more comfortable with the `sequoia-openpgp` library. Eventually, I'd like to use it on the [betrusted.io](https://betrusted.io) `precursor` device.
 
-Here's the [Demo.](https://jnaulty.github.io/sequoia-openpgp-webapp/) (rendered via `gh-pages`).
+Here's the [Demo.](https://jnaulty.github.io/sequoia-openpgp-webapp/) (rendered via `gh-pages`). It's written entirely in rust :crab: 
 
 ## Underlying Tech
 
@@ -60,6 +60,11 @@ The [RustCrypto Backend](https://gitlab.com/sequoia-pgp/sequoia/-/tree/main/open
 
 
 ## Miscellaneous
+
+### Build
+
+- `cargo install trunk`
+- `trunk serve --open`
 
 ### Deps.Dev
 
